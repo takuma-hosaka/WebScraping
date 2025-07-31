@@ -1,0 +1,46 @@
+name: Deploy to AWS Lambda
+
+# mainブランチにpushされたらトリガー
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. リポジトリの内容をチェックアウト（取得）する
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2. Pythonのセットアップ（バージョン指定）
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      # 3. 依存パッケージをインストールしてLambda用のフォルダに展開
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt -t .
+
+      # 4. LambdaにアップロードするZIPファイルを作成
+      - name: Zip Lambda package
+        run: zip -r function.zip .
+
+      # 5. AWS CLI用の認証情報を設定（GitHub Secretsから読み込み）
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-1
+
+      # 6. Lambda関数のコードを更新（デプロイ）
+      - name: Deploy to Lambda
+        run: |
+          aws lambda update-function-code \
+            --function-name my-lambda-function \
+            --zip-file fileb://function.zip
