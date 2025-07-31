@@ -21,10 +21,10 @@ jobs:
         with:
           python-version: '3.9'
 
-      # 3. 依存パッケージをインストールしてLambda用のフォルダに展開
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt -t .
+      # # 3. 依存パッケージをインストールしてLambda用のフォルダに展開
+      # - name: Install dependencies
+      #   run: |
+      #     pip install -r requirements.txt -t .
 
       # 4. LambdaにアップロードするZIPファイルを作成
       - name: Zip Lambda package
